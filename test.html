@@ -1,0 +1,138 @@
+<!doctype html>
+<html dir="ltr" lang="ja"
+     dark>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <meta charset="utf-8">
+    <title>wordleに拳で抵抗する</title>
+    <script>
+        const nthReplace = (str, n, after) => {
+  return str.substr(0, n) + after + str.substr(n+1);
+};
+        var all_words = {};
+    url = `./wordle.json`;
+    $.getJSON(url, (data) => { all_words = data });
+    $.getJSON("./high.json", (data) => { high_words = data });
+        function get_value(){
+            var o=document.getElementById("o").value;
+            var o_v=[document.getElementById("o-o").value,document.getElementById("o-t").value,document.getElementById("o-h").value,document.getElementById("o-f").value,document.getElementById("o-i").value];
+            
+            var t=document.getElementById("t").value;
+            var t_v=[document.getElementById("t-o").value,document.getElementById("t-t").value,document.getElementById("t-h").value,document.getElementById("t-f").value,document.getElementById("t-i").value];
+
+            var h=document.getElementById("h").value;
+            var h_v=[document.getElementById("h-o").value,document.getElementById("h-t").value,document.getElementById("h-h").value,document.getElementById("h-f").value,document.getElementById("h-i").value];
+
+            var f=document.getElementById("f").value;
+            var f_v=[document.getElementById("f-o").value,document.getElementById("f-t").value,document.getElementById("f-h").value,document.getElementById("f-f").value,document.getElementById("f-i").value];
+
+            var i=document.getElementById("i").value;
+            var i_v=[document.getElementById("i-o").value,document.getElementById("i-t").value,document.getElementById("i-h").value,document.getElementById("i-f").value,document.getElementById("i-i").value];
+
+            var r=[o,o_v,t,t_v,h,h_v,f,f_v,i,i_v]
+            return r;
+        }
+        function ans(){
+            answer=get_value();
+            var f_o = ".....";
+            var f_y = [];
+            var g_y=[];
+            var use_list=[];
+            var nuse_list = [];
+            for(var j=0;j<5;j++){
+                for(var k=0;k<5;k++){
+                    if(answer[j*2+1][k]=="o"){
+                        f_o=nthReplace(f_o,k,answer[j*2][k]);
+                        use_list.push(answer[j*2][k]);
+                    }
+                    else if(answer[j*2+1][k]=="y"){
+                        use_list.push(answer[j*2][k]);
+                        f_y.push(nthReplace(".....",k,answer[j*2][k]));
+                        console.log(f_y);
+                    }
+                    else if(answer[j*2+1][k]=="x"){
+                        nuse_list.push(answer[j*2][k]);
+                    }
+                }
+
+            }
+            for(var j=0;j<use_list.length;j++){
+                for(var k=0;k<nuse_list.length;k++){
+                    if(use_list[j]==nuse_list[k]){
+                        nuse_list.splice(k,1);
+                    }
+                }
+            }
+            console.log(f_y);
+            f_o="^(?="+f_o+")";
+            f_y ="(?!"+f_y.join(')(?!')+")";
+            console.log(f_y);
+            use_list ="(?=.*"+use_list.join(')(?=.*')+")";
+            nuse_list="(?!.*"+nuse_list.join(')(?!.*')+")";
+            if(use_list==="(?=.*)"){use_list="";}
+            if(f_y=="(?!)"){f_y="";}
+            if(nuse_list=="(?!.*)"){nuse_list=""}
+            console.log(f_o+f_y+use_list+nuse_list);
+            var sorted_list=[];
+            for(var j=0;j<all_words.length;j++){
+                if(new RegExp(f_o+f_y+use_list+nuse_list+".*$").test(all_words[j])){
+                    sorted_list.push(all_words[j]);
+                }
+            }
+            high_list=[]
+            for(var j=0;j<high_words.length;j++){
+                if(new RegExp(f_o+f_y+use_list+nuse_list+".*$").test(high_words[j])){
+                    high_list.push(high_words[j]);
+                }
+            }
+            console.log(sorted_list);
+            document.getElementById("high").textContent="可能性大:\n"+high_list.join("\n");
+            document.getElementById("kouho").textContent="全候補:\n"+sorted_list.join("\n");
+        }
+    </script>
+  </head>
+  <body>
+      <div>
+        <p>推奨:moved plans rugby witch</p>
+          <input type="text" id="o" maxlength="5"><br>
+          <select id="o-o"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="o-t"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="o-h"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="o-f"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="o-i"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          
+          <br><input type="text" id="t" maxlength="5"><br>
+          <select id="t-o"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="t-t"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="t-h"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="t-f"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="t-i"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+
+          <br><input type="text" id="h" maxlength="5"><br>
+          <select id="h-o"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="h-t"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="h-h"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="h-f"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="h-i"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+
+          <br><input type="text" id="f" maxlength="5"><br>
+          <select id="f-o"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="f-t"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="f-h"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="f-f"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="f-i"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+
+          <br><input type="text" id="i" maxlength="5"><br>
+          <select id="i-o"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>  
+          <select id="i-t"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="i-h"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="i-f"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+          <select id="i-i"><option value="?">⬛</option><option value="x">⬜</option><option value="y">🟨</option><option value="o">🟩</option></select>
+
+          <br><button id="bt_one" onclick="ans()">確定</button>
+          <p id="high"></p>
+          <br><p id="kouho"></p>
+  </div>
+  </body>
+</html>
